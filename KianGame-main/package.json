@@ -1,0 +1,13 @@
+{
+  "name": "kianpori-game-web",
+  "version": "2.0.0",
+  "description": "Kianpori Game web version + Telegram admin bot (visitor tracking, remote control) - ready to deploy on Railway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {}
+}

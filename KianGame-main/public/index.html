@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>بازی کیان پوری</title>
+<meta name="description" content="بازی کیان پوری - یک بازی آنلاین پرش از موانع" />
+<meta name="theme-color" content="#0e1116" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" href="/assets/images/icon.ico" />
+<link rel="apple-touch-icon" href="/assets/images/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <div id="game-wrap">
+    <div id="canvas-stage">
+      <canvas id="game" width="1100" height="500"></canvas>
+
+      <!-- loading / audio-unlock overlay -->
+      <div id="start-overlay">
+        <div id="start-card">
+          <div id="start-title">بازی کیان پوری</div>
+          <div id="start-sub">برای شروع لمس کن یا کلیک کن</div>
+          <div id="start-spinner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- fullscreen button (hidden automatically where the browser can't do fullscreen) -->
+  <button id="btn-fullscreen" type="button" tabindex="-1" aria-label="تمام صفحه" title="تمام صفحه (F)" hidden>
+    <svg class="ico-enter" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+    </svg>
+    <svg class="ico-exit" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+    </svg>
+  </button>
+
+  <div id="rotate-hint">📱 برای تجربه بهتر گوشی را افقی کن</div>
+
+  <!-- mobile touch controls: fixed layout (duck on the left, jump on the right) -->
+  <div id="touch-controls" dir="ltr">
+    <button id="btn-duck" type="button" tabindex="-1" class="touch-btn" aria-label="خم شدن">خم شو</button>
+    <button id="btn-jump" type="button" tabindex="-1" class="touch-btn touch-btn-primary" aria-label="پرش">پرش</button>
+  </div>
+
+  <div id="site-footer" aria-hidden="true">Made by Erfan</div>
+
+  <script src="/track.js"></script>
+  <script src="/game.js"></script>
+</body>
+</html>

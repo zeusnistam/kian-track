@@ -1,0 +1,306 @@
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #0e1116;
+  --card-bg: rgba(20, 24, 32, 0.92);
+  --accent: #ffd23f;
+  --text: #f4f4f4;
+  font-family: "Vazirmatn", "Tahoma", "Segoe UI", sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  --reserved: 0px; /* vertical space taken by things other than the canvas */
+  --vpad: calc(env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px));
+}
+
+/* fixed to the viewport (not 100% height) so mobile browser toolbars
+   showing/hiding can never push the game off-screen */
+#game-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+           env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+
+/* The canvas is limited by BOTH width and height, so it always fits fully
+   on screen (the old version got cropped on landscape phones).
+   vh first as a fallback for browsers without dvh. */
+#canvas-stage {
+  position: relative;
+  width: min(100%, 1100px, calc((100vh - var(--vpad) - var(--reserved)) * 2.2));
+  width: min(100%, 1100px, calc((100dvh - var(--vpad) - var(--reserved)) * 2.2));
+  aspect-ratio: 1100 / 500;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  background: #ffffff;
+}
+
+body.is-fullscreen #canvas-stage { border-radius: 0; box-shadow: none; }
+
+canvas#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* ---- start / audio-unlock overlay ---- */
+#start-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 12, 16, 0.78);
+  backdrop-filter: blur(2px);
+  z-index: 20;
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+#start-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#start-card {
+  text-align: center;
+  color: var(--text);
+  padding: 24px 34px;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+}
+#start-title {
+  font-size: clamp(20px, 4vw, 32px);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+#start-sub {
+  font-size: clamp(13px, 2.4vw, 16px);
+  opacity: 0.85;
+  margin-bottom: 14px;
+}
+#start-spinner {
+  width: 26px;
+  height: 26px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+#start-overlay.loading #start-spinner { display: block; }
+#start-overlay.loading #start-sub { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- fullscreen button (top corner) ---- */
+#btn-fullscreen {
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top, 0px));
+  left: max(8px, env(safe-area-inset-left, 0px));
+  z-index: 40;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgba(20, 24, 32, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
+}
+#btn-fullscreen[hidden] { display: none; }
+#btn-fullscreen:hover { background: rgba(20, 24, 32, 0.8); }
+#btn-fullscreen:active { background: rgba(255, 255, 255, 0.3); }
+#btn-fullscreen .ico-exit { display: none; }
+body.is-fullscreen #btn-fullscreen .ico-enter { display: none; }
+body.is-fullscreen #btn-fullscreen .ico-exit { display: block; }
+
+/* ---- portrait hint (phones only) ---- */
+#rotate-hint {
+  display: none;
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top, 0px));
+  left: 60px;
+  right: 12px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+/* ---- mobile touch controls ---- */
+#touch-controls {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px max(14px, env(safe-area-inset-right, 0px))
+           calc(12px + env(safe-area-inset-bottom, 0px))
+           max(14px, env(safe-area-inset-left, 0px));
+  pointer-events: none; /* only the buttons themselves catch touches */
+}
+body.show-controls #touch-controls { display: flex; }
+
+.touch-btn {
+  pointer-events: auto;
+  flex: 1;
+  max-width: 260px;
+  height: 88px;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: clamp(16px, 4.4vw, 22px);
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
+}
+.touch-btn:active { background: rgba(255, 255, 255, 0.28); }
+.touch-btn-primary {
+  background: rgba(255, 210, 63, 0.92);
+  color: #201a02;
+  border-color: rgba(255, 210, 63, 1);
+}
+.touch-btn-primary:active { background: #ffd23f; }
+
+/* ---------- phone / touch layout (body.is-mobile is set by game.js) ---------- */
+
+/* Portrait: fullscreen button + hint live in a top bar, the game sits under
+   it, big buttons sit at the bottom where thumbs are. */
+@media (orientation: portrait) {
+  body.is-mobile #game-wrap {
+    justify-content: flex-start;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 56px);
+  }
+  body.is-mobile #rotate-hint { display: flex; }
+}
+
+/* Landscape: the game takes the whole screen and the buttons float over the
+   empty ground area at the bottom corners (duck = left, jump = right). */
+@media (orientation: landscape) {
+  body.is-mobile .touch-btn {
+    flex: 0 0 auto;
+    width: clamp(110px, 18vw, 170px);
+    height: 62px;
+    font-size: 18px;
+    background: rgba(0, 0, 0, 0.38);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+  }
+  body.is-mobile .touch-btn:active { background: rgba(255, 255, 255, 0.35); }
+  body.is-mobile .touch-btn-primary {
+    background: rgba(255, 210, 63, 0.85);
+    border-color: rgba(255, 210, 63, 1);
+    color: #201a02;
+  }
+  body.is-mobile #touch-controls { padding-top: 6px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- tiny faint footer ---------- */
+#site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: max(3px, env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  text-align: center;
+  font: 500 10px/1 "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+  letter-spacing: 0.04em;
+  color: #8a8f98;
+  opacity: 0.32;
+  pointer-events: none;
+  direction: ltr;
+}
+body.show-controls #site-footer { opacity: 0; }
+
+/* ---------- remote control: lock overlay, banner, messages ---------- */
+#kg-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 12, 16, 0.96);
+  color: var(--text);
+  text-align: center;
+  touch-action: auto;
+}
+.kg-lock-card { max-width: 420px; }
+.kg-lock-icon { font-size: 60px; }
+.kg-lock-title { font-size: clamp(20px, 5vw, 26px); font-weight: 800; margin: 10px 0 8px; }
+.kg-lock-text { opacity: 0.8; line-height: 1.9; font-size: 15px; }
+
+.kg-note {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(92vw, 520px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+  background: rgba(20, 24, 32, 0.95);
+  border: 1px solid rgba(255, 210, 63, 0.55);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  touch-action: auto;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.kg-banner { top: max(8px, env(safe-area-inset-top, 0px)); }
+.kg-dm { bottom: calc(60px + env(safe-area-inset-bottom, 0px)); border-color: rgba(120, 200, 255, 0.6); }
+.kg-note-x {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+}
