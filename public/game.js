@@ -1127,7 +1127,7 @@
     }
     if (coinHit) {
       coins.splice(coins.indexOf(coinHit), 1);
-      shieldCharges = Math.min(shieldCharges + 1, 2);
+      shieldCharges = Math.min(shieldCharges + 1, 5);
       spawnParticles(coinHit.x, coinHit.y, [255, 210, 60]);
       playFresh(sounds.coin);
     }
