@@ -633,7 +633,7 @@
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       const hint = IS_MOBILE
-        ? "لمس کن تا بپری  |  دکمه «خم شو» برای خم شدن"
+        ? "با «پرش» بپر  |  با «خم شو» کیانپوری رو خم کن!"
         : "Space یا Enter برای شروع سریع  |  M برای قطع صدا";
       const hintY = IS_MOBILE ? L.menuMute.y + L.menuMute.h + 6 : HEIGHT - 42;
       ctx.fillText(hint, 60, hintY);
