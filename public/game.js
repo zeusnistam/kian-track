@@ -1105,9 +1105,9 @@
       const startX = randInt(1100, 1300);
       for (let i = 0; i < number; i++) {
         if (score >= 10 && Math.random() < 0.3) {
-          obstacles.push({ x: startX + i * 255, y: 280, w: 40, h: 30, type: "fly" });
+          obstacles.push({ x: startX + i * 265, y: 280, w: 40, h: 30, type: "fly" });
         } else {
-          obstacles.push({ x: startX + i * 255, y: 310, w: 25, h: 40, type: "ground" });
+          obstacles.push({ x: startX + i * 265, y: 310, w: 25, h: 40, type: "ground" });
         }
       }
     }
